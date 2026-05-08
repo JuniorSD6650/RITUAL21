@@ -4,7 +4,7 @@ namespace Ritual21.SpecialCards;
 
 public class Espectro : Carta
 {
-    public Espectro() : base("Espectro Legendario", 10) { }
+    public Espectro() : base("Espectro Legendario", 1) { }
     public override bool TieneHabilidad => true;
     public override void ActivarHabilidad(Jugador actual, List<Jugador> todos)
     {

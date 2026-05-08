@@ -12,8 +12,19 @@ public static class GuiHelper
     {
         Rectangle rect = new Rectangle(x, y, w, h);
         bool hover = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), rect);
-        Raylib.DrawRectangleRec(rect, hover ? Color.Red : col);
-        Raylib.DrawText(texto, x + (w / 2 - Raylib.MeasureText(texto, 20) / 2), y + h / 2 - 10, 20, Color.White);
+
+        // Efecto visual: si se presiona (toque), se oscurece
+        Color colorFinal = hover ? Color.Red : col;
+        if (hover && Raylib.IsMouseButtonDown(MouseButton.Left)) colorFinal = Color.Maroon;
+
+        Raylib.DrawRectangleRec(rect, colorFinal);
+        Raylib.DrawRectangleLinesEx(rect, 2, Color.Gold); // Borde dorado profesional
+
+        int fontSize = 20;
+        int textX = x + (w / 2 - Raylib.MeasureText(texto, fontSize) / 2);
+        int textY = y + h / 2 - 10;
+        Raylib.DrawText(texto, textX, textY, fontSize, Color.White);
+
         return hover && Raylib.IsMouseButtonPressed(MouseButton.Left);
     }
 
@@ -21,14 +32,30 @@ public static class GuiHelper
     {
         Raylib.DrawText(titulo, x, y - 35, 20, Color.Gold);
         Raylib.DrawRectangle(x, y, w, 50, Color.Black);
-        Raylib.DrawRectangleLines(x, y, w, 50, Color.Gold);
-        Raylib.DrawText(texto + "_", x + 15, y + 10, 30, Color.RayWhite);
+        Raylib.DrawRectangleLinesEx(new Rectangle(x, y, w, 50), 2, Color.Gold);
+        Raylib.DrawText(texto + "|", x + 15, y + 10, 30, Color.RayWhite);
     }
 
     public static void DibujarCarta(Carta carta, Vector2 posicion, float escala)
     {
         Texture2D tex = ObtenerTextura(carta);
+
+        Raylib.DrawTextureEx(tex, posicion + new Vector2(4, 4), 0, escala, new Color(0, 0, 0, 100));
+
         Raylib.DrawTextureEx(tex, posicion, 0, escala, Color.White);
+
+        string textoValor = carta.Valor.ToString();
+
+        int fontSize = (int)(75 * escala);
+        if (fontSize < 18) fontSize = 18; 
+
+        int anchoCartaEscalada = (int)(tex.Width * escala);
+        int textoAncho = Raylib.MeasureText(textoValor, fontSize);
+
+        int posXTexto = (int)posicion.X + (anchoCartaEscalada / 2 - textoAncho / 2);
+        int posYTexto = (int)posicion.Y + (int)(tex.Height * escala) + 5;
+
+        Raylib.DrawText(textoValor, posXTexto, posYTexto, fontSize, Color.SkyBlue);
     }
 
     public static Texture2D ObtenerTextura(Carta c)

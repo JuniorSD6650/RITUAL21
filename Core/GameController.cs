@@ -4,12 +4,10 @@ using Ritual21.Models;
 
 namespace Ritual21.Core;
 
-// Clase para gestionar el movimiento visual de las cartas
-public class CartaEnVuelo
+public class CartaEnVuelo 
 {
-    // Usamos '!' para decirle a C# que confíe en que daremos valor a estos campos
     public Carta Info { get; set; } = null!;
-    public Jugador Propietario { get; set; } = null!;
+    public Jugador Propietario { get; set; } = null!; 
     public Vector2 PosicionActual { get; set; }
     public Vector2 Destino { get; set; }
     public float EscalaActual { get; set; } = 0.05f;
@@ -29,23 +27,17 @@ public class GameController
     public bool BloqueadoPorAnimacion = false;
     public bool RealizoAccionEsteTurno = false;
 
-    // Lista de animaciones activas
     public List<CartaEnVuelo> AnimacionesActivas = new();
 
     public void Actualizar()
     {
-        // 1. LÓGICA DE ANIMACIONES (Mover las cartas cuadro a cuadro)
+        // 1. LÓGICA DE ANIMACIONES
         for (int i = AnimacionesActivas.Count - 1; i >= 0; i--)
         {
             var anim = AnimacionesActivas[i];
-
-            // Suavizado de movimiento (Lerp)
             anim.PosicionActual = Vector2.Lerp(anim.PosicionActual, anim.Destino, 0.15f);
-
-            // Crecimiento visual
             if (anim.EscalaActual < 0.25f) anim.EscalaActual += 0.01f;
 
-            // Al llegar al destino
             if (Vector2.Distance(anim.PosicionActual, anim.Destino) < 1.0f)
             {
                 anim.Propietario.Mano.Add(anim.Info);
@@ -54,18 +46,14 @@ public class GameController
             }
         }
 
-        // 2. DESBLOQUEO DE INTERFAZ
+        // 2. DESBLOQUEO
         if (BloqueadoPorAnimacion && AnimacionesActivas.Count == 0 && Raylib.GetTime() >= TiempoEspera)
-        {
             BloqueadoPorAnimacion = false;
-        }
 
-        // 3. CAPTURA DE TECLADO
+        // 3. ENTRADA DE TEXTO
         if (Estado == EstadoJuego.REGISTRO_CANTIDAD || Estado == EstadoJuego.REGISTRO_NOMBRES)
             ManejarTeclado();
     }
-
-    // --- MÉTODOS DE LÓGICA QUE FALTABAN ---
 
     private void ManejarTeclado()
     {
@@ -84,6 +72,7 @@ public class GameController
         MazoActual = new Mazo();
         MazoActual.Barajar();
         Participantes.Clear();
+        InputTexto = "";
     }
 
     public void ComenzarDuelo()
@@ -91,34 +80,29 @@ public class GameController
         MazoActual.Barajar();
         foreach (var j in Participantes)
         {
-            j.Mano.Clear();
-            j.Puntos = 0;
-            j.SePlanto = false;
-            // Reparto inicial instantáneo para no saturar de animaciones al empezar
-            for (int i = 0; i < 2; i++)
-            {
-                Carta c = MazoActual.RobarCarta();
-                j.Mano.Add(c);
-                j.Puntos += c.Valor;
-            }
+            j.Mano.Clear(); j.Puntos = 0; j.SePlanto = false;
+            for (int i = 0; i < 2; i++) RobarPara(j);
         }
         IndiceActual = 0;
         RealizoAccionEsteTurno = false;
         Estado = EstadoJuego.ESPERA_TURNO;
     }
 
+    public void RobarPara(Jugador j)
+    {
+        Carta c = MazoActual.RobarCarta();
+        j.Mano.Add(c);
+        j.Puntos += c.Valor;
+    }
+
     public void RobarConAnimacion(Jugador j)
     {
         Carta c = MazoActual.RobarCarta();
-        var anim = new CartaEnVuelo
-        {
-            Info = c,
-            Propietario = j,
-            PosicionActual = new Vector2(400, 300), // Sale del mazo (centro)
+        AnimacionesActivas.Add(new CartaEnVuelo {
+            Info = c, Propietario = j,
+            PosicionActual = new Vector2(400, 300),
             Destino = new Vector2(50 + (j.Mano.Count * 110), 140)
-        };
-
-        AnimacionesActivas.Add(anim);
+        });
         BloqueadoPorAnimacion = true;
         RealizoAccionEsteTurno = true;
     }
@@ -127,8 +111,7 @@ public class GameController
     {
         RealizoAccionEsteTurno = false;
         int intentos = 0;
-        do
-        {
+        do {
             IndiceActual = (IndiceActual + 1) % Participantes.Count;
             intentos++;
         } while ((Participantes[IndiceActual].SePlanto || Participantes[IndiceActual].Puntos >= 21) && intentos < Participantes.Count);
@@ -143,17 +126,7 @@ public class GameController
         {
             CartaInspeccionada.ActivarHabilidad(Participantes[IndiceActual], Participantes);
             CartaInspeccionada.HabilidadUsada = true;
-            CartaInspeccionada = null;
+            CartaInspeccionada = null; 
         }
-    }
-
-    public void RobarPara(Jugador j)
-    {
-        Carta c = MazoActual.RobarCarta();
-
-        j.Mano.Add(c);
-        j.Puntos += c.Valor;
-
-        RealizoAccionEsteTurno = true;
     }
 }
