@@ -114,6 +114,8 @@ void ManejarSeleccionDeCartas(GameController g, Vector2 mouse)
 
 void DibujarInspeccion(GameController g)
 {
+    if (g.CartaInspeccionada == null) return;
+    
     Raylib.DrawRectangle(0, 0, 800, 600, new Color(0, 0, 0, 245)); // Fondo más oscuro
 
     Texture2D tex = GuiHelper.ObtenerTextura(g.CartaInspeccionada!);
@@ -169,7 +171,7 @@ void DibujarEscenaJuego(GameController g)
                 g.PasarSiguiente();
             }
         }
-        else 
+        else
         {
             // Solo sale este botón si ya pidió
             if (GuiHelper.DibujarBoton(310, 480, 200, 60, "TERMINAR TURNO", Color.DarkGreen))
@@ -177,6 +179,11 @@ void DibujarEscenaJuego(GameController g)
                 g.PasarSiguiente();
             }
         }
+    }
+
+    foreach (var anim in g.AnimacionesActivas)
+    {
+        GuiHelper.DibujarCarta(anim.Info, anim.PosicionActual, anim.EscalaActual);
     }
 }
 

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Ritual21DeckChronicles")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+146f7afddecc4fed3068f9c281a8385c40d39755")]
 [assembly: System.Reflection.AssemblyProductAttribute("Ritual21DeckChronicles")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Ritual21DeckChronicles")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
